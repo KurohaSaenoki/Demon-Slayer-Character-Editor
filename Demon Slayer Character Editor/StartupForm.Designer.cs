@@ -138,7 +138,7 @@
             this.MinimumSize = new System.Drawing.Size(614, 439);
             this.Name = "StartupForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "Demon Slayer Character Editor";
+            this.Text = "Demon Slayer Character Editor | Ver 1.0.1";
             this.Activated += new System.EventHandler(this.StartupForm_Activated);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();

@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Demon_Slayer_Character_Editor
 {
 	public partial class DamageEditorForm : Form
 	{
-		public Regex reg = new Regex(@"^-?\d+[.]?\d*$");
+		public Regex reg = new Regex(@"^-?\d+[.]?\d*$", System.Text.RegularExpressions.RegexOptions.CultureInvariant);
 		public string[] ReadAllLines = Array.Empty<string>();
 		public string[] ReadAllLinesOrig = Array.Empty<string>();
 		public string StreamingPath = "";
@@ -610,6 +601,7 @@ namespace Demon_Slayer_Character_Editor
 		public DamageEditorForm()
 		{
 			InitializeComponent();
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -1458,7 +1450,7 @@ Example: If you set Combo Timer to Infinite, then toggle to this to Combo Timer,
 
 				StructGUIDFound = 0;
 
-				Restart:
+			Restart:
 
 				for (int i = 0; i < ReadAllLines.Length; i++)
 				{
@@ -1603,7 +1595,7 @@ Example: If you set Combo Timer to Infinite, then toggle to this to Combo Timer,
 				StructGUIDFound = 0;
 				ListBoxIndex = DamageListBox.Items.IndexOf(DamageListBox.SelectedItem) + 1;
 
-				FinishedModifyAllLabel:
+			FinishedModifyAllLabel:
 
 				if (ModifyAll && FinishedModifyAll == false)
 				{
@@ -2097,8 +2089,8 @@ Example: If you set Combo Timer to Infinite, then toggle to this to Combo Timer,
 					FinishedModifyAll = false;
 				}
 
-				if(FinishedModifyAll)
-				{ 
+				if (FinishedModifyAll)
+				{
 					goto FinishedModifyAllLabel;
 				}
 			}
@@ -2207,7 +2199,7 @@ Example: If you set Combo Timer to Infinite, then toggle to this to Combo Timer,
 			}
 
 			decimal GetIntComboBoxValueSubDec = 0;
-			Decimal.TryParse(GetIntComboBoxValueSub, out GetIntComboBoxValueSubDec);
+			Decimal.TryParse(GetIntComboBoxValueSub, NumberStyles.Any, new CultureInfo("en-US"), out GetIntComboBoxValueSubDec);
 
 			if (CheckLine.Contains("ComboableFrame"))
 			{
@@ -2299,7 +2291,7 @@ Example: If you set Combo Timer to Infinite, then toggle to this to Combo Timer,
 		private void SetInt(TextBox text, int offset)
 		{
 			int LineNum = ioffset + offset - 2;
-			Decimal.TryParse(text.Text, out Amount);
+			Decimal.TryParse(text.Text, NumberStyles.Any, new CultureInfo("en-US"), out Amount);
 			string Str = ValueStr + Amount;
 			ReadAllLines[LineNum] = Str;
 		}
@@ -2390,8 +2382,9 @@ Example: If you set Combo Timer to Infinite, then toggle to this to Combo Timer,
 		private void SetFloat(TextBox text, int offset)
 		{
 			int LineNum = ioffset + offset - 2;
-			Decimal.TryParse(text.Text, out Amount);
+			Decimal.TryParse(text.Text, NumberStyles.Any, new CultureInfo("en-US"), out Amount);
 			string Str = ValueStr + Amount + ",";
+			//MessageBox.Show("TextBox Text: " + text.Text + "\nDecimal Amount: " + Amount.ToString() + "\n\n\n" + "String Damage Value for Table ID: " + StructGUIDFound + "\n" + Str.ToString());
 			ReadAllLines[LineNum] = Str;
 		}
 
@@ -2725,7 +2718,7 @@ Example: If you set Combo Timer to Infinite, then toggle to this to Combo Timer,
 		private void CreateNewName()
 		{
 			NewVal = 1;
-			Restart:
+		Restart:
 			//Goes through every single ListBox id
 			foreach (string s in DamageListBox.Items)
 			{
@@ -2822,54 +2815,58 @@ Example: If you set Combo Timer to Infinite, then toggle to this to Combo Timer,
 
 		private void NumberKeyPress(TextBox textBox, KeyPressEventArgs e)
 		{
-			if (textBox.Focused)
+			if (textBox.Focused && (textBox.Text != "-" || textBox.Text != ""))
 			{
-				if (char.IsControl(e.KeyChar)) return;
-				if (!reg.IsMatch(textBox.Text.Insert(textBox.SelectionStart, e.KeyChar.ToString()) + "1")) e.Handled = true;
+				if (char.IsControl(e.KeyChar))
+					return;
+
+				if (!reg.IsMatch(textBox.Text.Insert(textBox.SelectionStart, e.KeyChar.ToString()) + "1"))
+					e.Handled = true;
 			}
 		}
 
 		private void NumberTextChanged(TextBox textBox, decimal Amount)
 		{
-			if (textBox.Focused)
+			if (textBox.Focused && (textBox.Text != "-" || textBox.Text != ""))
 			{
-				if (textBox.Text != "-" || textBox.Text == "")
+				try
 				{
-					try
-					{
-						Amount = Decimal.Parse(textBox.Text);
-					}
-					catch
-					{
-						Amount = 0;
-					}
-
-					if (Amount.ToString() != textBox.Text && Amount.ToString() + "." != textBox.Text)
-					{
-						textBox.Text = Amount.ToString();
-					}
+					Decimal.TryParse(textBox.Text, NumberStyles.Any, new CultureInfo("en-US"), out Amount);
+				}
+				catch
+				{
+					Amount = 0;
+					textBox.Text = "0";
 				}
 			}
 		}
 
 		private void NumberLeave(TextBox textBox, decimal Amount)
 		{
+			if (textBox.Text == "-" || textBox.Text == "" || textBox.Text == "-0" || textBox.Text == "-0.")
+			{
+				Amount = 0;
+				textBox.Text = "0";
+			}
+
 			if (textBox.Focused == false)
 			{
-				Decimal.TryParse(textBox.Text, out Amount);
-
-				if (textBox.Text == "-" || Amount.ToString() != textBox.Text && Amount.ToString() + "." != textBox.Text)
+				try
+				{
+					Decimal.TryParse(textBox.Text, NumberStyles.Any, new CultureInfo("en-US"), out Amount);
+				}
+				catch
 				{
 					Amount = 0;
-					textBox.Text = "0";
+					MessageBox.Show("Something went wrong inside NumberLeave function. Amount changed to 0");
 				}
-
-				//Trims off a remaining . if you forget to remove it.
-				char[] charsToTrim = { '.' };
-				string TrimmedCharString = textBox.Text.Trim(charsToTrim);
-
-				textBox.Text = TrimmedCharString;
 			}
+
+			//Trims off a remaining . if you forget to remove it.
+			char[] charsToTrim = { '.' };
+			string TrimmedCharString = textBox.Text.Trim(charsToTrim);
+
+			textBox.Text = TrimmedCharString;
 		}
 
 		private void Generalized_KeyPress(object sender, KeyPressEventArgs e)
@@ -3087,7 +3084,7 @@ Example: If you set Combo Timer to Infinite, then toggle to this to Combo Timer,
 			}
 		}
 
-        private void ComboableFrameComboBox_DrawItem(object sender, DrawItemEventArgs e)
+		private void ComboableFrameComboBox_DrawItem(object sender, DrawItemEventArgs e)
 		{
 			int index = e.Index >= 0 ? e.Index : -1;
 			Brush brush = ((e.State & DrawItemState.Selected) > 0) ? SystemBrushes.HighlightText : new SolidBrush(ComboableFrameComboBox.ForeColor);
@@ -3099,7 +3096,7 @@ Example: If you set Combo Timer to Infinite, then toggle to this to Combo Timer,
 			e.DrawFocusRectangle();
 		}
 
-        private void ComboableFrameComboBox_SelectedIndexChanged(object sender, EventArgs e)
+		private void ComboableFrameComboBox_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (ComboableFrameComboBox.SelectedIndex <= 0 || ComboableFrameComboBox.SelectedIndex > 3)
 			{
@@ -3119,7 +3116,7 @@ Example: If you set Combo Timer to Infinite, then toggle to this to Combo Timer,
 			}
 		}
 
-        private void YoinkFromFileButton_Click(object sender, EventArgs e)
+		private void YoinkFromFileButton_Click(object sender, EventArgs e)
 		{
 			bool UserBackedOut = false;
 			bool IsValidDamageFileToYoink = false;

@@ -7,7 +7,12 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>e86e2e3620130314ddb3a8b87ef46654e5449b44.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="e86e2e3620130314ddb3a8b87ef46654e5449b44.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="SelectDmgIDForm.cs">

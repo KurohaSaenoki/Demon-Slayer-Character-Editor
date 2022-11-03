@@ -1526,6 +1526,7 @@
             this.EvidComboBox.Name = "EvidComboBox";
             this.EvidComboBox.Size = new System.Drawing.Size(313, 23);
             this.EvidComboBox.TabIndex = 4;
+            this.EvidComboBox.SelectedIndexChanged += new System.EventHandler(this.EvidComboBox_SelectedIndexChanged);
             // 
             // MoveToButton
             // 

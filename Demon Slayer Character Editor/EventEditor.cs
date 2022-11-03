@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Demon_Slayer_Character_Editor
 {
 	public partial class EventEditorForm : Form
 	{
-		public Regex reg = new Regex(@"^-?\d+[.]?\d*$");
+		public Regex reg = new Regex(@"^-?\d+[.]?\d*$", System.Text.RegularExpressions.RegexOptions.CultureInvariant);
 		public string[] ReadAllLines = Array.Empty<string>();
 		public string[] ReadAllLinesOrig = Array.Empty<string>();
 		public string[] ReadAllLinesBasic = Array.Empty<string>();
@@ -573,7 +564,7 @@ namespace Demon_Slayer_Character_Editor
 "ME_DISABLE_SUPPORT_ENEMY",
 "ME_BELOW_GROUND_WARP_PARTNER"};
 		public bool NotifyUserBasic = true;
-		public bool NotifyUserDamageReac= true;
+		public bool NotifyUserDamageReac = true;
 		public bool NotifyUserMelee = true;
 		public bool NotifyUserSupport = true;
 		public int MoveToIndex = 0;
@@ -583,6 +574,7 @@ namespace Demon_Slayer_Character_Editor
 		public bool AllowToolTips = false;
 		public bool ClickedApply = false;
 		public int RememberIndexForResize = 0;
+		public ToolTip ttTiming = new ToolTip();
 		public ToolTip ttEvID = new ToolTip();
 		public ToolTip ttArgN1 = new ToolTip();
 		public ToolTip ttArgN2 = new ToolTip();
@@ -598,11 +590,12 @@ namespace Demon_Slayer_Character_Editor
 		public ToolTip ttEndureId = new ToolTip();
 
 		public EventEditorForm()
-        {
-            InitializeComponent();
+		{
+			InitializeComponent();
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
 		}
 
-        private void EventEditorForm_Load(object sender, EventArgs e)
+		private void EventEditorForm_Load(object sender, EventArgs e)
 		{
 			if (Properties.Settings.Default.CreateBackupsEvent)
 			{
@@ -761,6 +754,7 @@ namespace Demon_Slayer_Character_Editor
 
 				StreamingPath = OpenDialogStreaming.FileName;
 				Properties.Settings.Default.RememberEventPath = StreamingPath;
+				Properties.Settings.Default.Save();
 
 				ReadAllLines = File.ReadAllLines(StreamingPath);
 				//The original stuff, used for reverting file names and creating backups.
@@ -1066,6 +1060,7 @@ namespace Demon_Slayer_Character_Editor
 				{
 					Properties.Settings.Default.RememberSupportPath = FilePath;
 				}
+				Properties.Settings.Default.Save();
 
 				FilePathOrig = FilePath;
 				readlines = File.ReadAllLines(FilePath);
@@ -1277,40 +1272,25 @@ namespace Demon_Slayer_Character_Editor
 					}
 				}
 			}
+		}
 
-			string InfoChar = " ⍰";
-			string[] KnownEventIDFunctions = {
-"ME_SET_SPEED",
-"ME_HOMING_SET",
-"ME_HOMING_END",
-"ME_ON_LAND",
-"ME_ANIMATION_RATE_CHANGE",
-"ME_SUPER_ARMOR_ON",
-"ME_SUPER_ARMOR_OFF",
-"REQUEST_ACTION_ANIM_ID",
-"START_CANCEL_RECEPTION",
-"END_CANCEL_RECEPTION",
-"ADD_CMB_CANCEL_ENABLE_TO_CANCEL",
-"ME_CREATE_MELEECOLLISION_UNITGROUP",
-"ME_CREATE_MELEECOLLISION_UNIT",
-"ME_DELETE_MELEECOLLISION_UNIT",
-"ME_DELETE_MELEECOLLISION_UNITGROUP",
-"ME_INSTANT_RECOVER_LIFE",
-"ME_DURATION_RECOVER_LIFE"};
-
-			string OriginalEvidLabel = EvidLabel.Text.Replace(InfoChar, "");
-			string OriginalArgN1Label = ArgN1Label.Text.Replace(InfoChar, "");
-			string OriginalArgN2Label = ArgN2Label.Text.Replace(InfoChar, "");
-			string OriginalArgN3Label = ArgN3Label.Text.Replace(InfoChar, "");
-			string OriginalArgF1Label = ArgF1Label.Text.Replace(InfoChar, "");
-			string OriginalArgF2Label = ArgF2Label.Text.Replace(InfoChar, "");
-			string OriginalArgF3Label = ArgF3Label.Text.Replace(InfoChar, "");
-			string OriginalArgF4Label = ArgF4Label.Text.Replace(InfoChar, "");
-			string OriginalArgF5Label = ArgF5Label.Text.Replace(InfoChar, "");
-			string OriginalArgF6Label = ArgF6Label.Text.Replace(InfoChar, "");
-			string OriginalCoordNameLabel = CoordNameLabel.Text.Replace(InfoChar, "");
-			string OriginalDamageIdLabel = DamageIdLabel.Text.Replace(InfoChar, "");
-			string OriginalEndureIdLabel = EndureIdLabel.Text.Replace(InfoChar, "");
+		private void EvidComboBox_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			string OriginalTimingLabel = TimingLabel.Text.Replace(" ⍰", "");
+			string OriginalEvidLabel = EvidLabel.Text.Replace(" ⍰", "");
+			string OriginalArgN1Label = ArgN1Label.Text.Replace(" ⍰", "");
+			string OriginalArgN2Label = ArgN2Label.Text.Replace(" ⍰", "");
+			string OriginalArgN3Label = ArgN3Label.Text.Replace(" ⍰", "");
+			string OriginalArgF1Label = ArgF1Label.Text.Replace(" ⍰", "");
+			string OriginalArgF2Label = ArgF2Label.Text.Replace(" ⍰", "");
+			string OriginalArgF3Label = ArgF3Label.Text.Replace(" ⍰", "");
+			string OriginalArgF4Label = ArgF4Label.Text.Replace(" ⍰", "");
+			string OriginalArgF5Label = ArgF5Label.Text.Replace(" ⍰", "");
+			string OriginalArgF6Label = ArgF6Label.Text.Replace(" ⍰", "");
+			string OriginalCoordNameLabel = CoordNameLabel.Text.Replace(" ⍰", "");
+			string OriginalDamageIdLabel = DamageIdLabel.Text.Replace(" ⍰", "");
+			string OriginalEndureIdLabel = EndureIdLabel.Text.Replace(" ⍰", "");
+			TimingLabel.Text = OriginalTimingLabel;
 			EvidLabel.Text = OriginalEvidLabel;
 			ArgN1Label.Text = OriginalArgN1Label;
 			ArgN2Label.Text = OriginalArgN2Label;
@@ -1327,8 +1307,8 @@ namespace Demon_Slayer_Character_Editor
 
 			if (AllowToolTips)
 			{
-
 				ttEvID.RemoveAll();
+				string TimingLabelStr = "";
 				string EvIdLabelStr = "";
 				string ArgN1LabelStr = "";
 				string ArgN2LabelStr = "";
@@ -1343,121 +1323,158 @@ namespace Demon_Slayer_Character_Editor
 				string DamageIdLabelStr = "";
 				string EndureIdLabelStr = "";
 
-				if (KnownEventIDFunctions.Contains(EvidComboBox.Text))
+				if (TimingTextBox.Text != "")
 				{
-					if (EvidComboBox.Text == "ME_SET_SPEED")
-					{
-						EvIdLabelStr = "Causes Player to move";
-						ArgN2LabelStr = "Speed?";
-					}
-					if (EvidComboBox.Text == "ME_HOMING_SET")
-					{
-						EvIdLabelStr = "Causes Player to track the Opponent";
-					}
-					if (EvidComboBox.Text == "ME_HOMING_END")
-					{
-						EvIdLabelStr = "Disables ME_HOMING_SET";
-					}
-					if (EvidComboBox.Text == "ME_ON_LAND")
-					{
-						EvIdLabelStr = "Skips ahead to another Timing";
-						ArgN2LabelStr = "Timing to skip to";
-					}
-					if (EvidComboBox.Text == "ME_ANIMATION_RATE_CHANGE")
-					{
-						EvIdLabelStr = "Changing Animation Speed";
-						ArgF2LabelStr = "Animation Speed Rate";
-					}
-					if (EvidComboBox.Text == "ME_SUPER_ARMOR_ON")
-					{
-						EvIdLabelStr = "This Enables Super Armor used for Surge/Ground Tilt Attacks";
-						ArgN1LabelStr = "Priority? Surge entries has it marked as 10000 while Tilts have it as 5000.";
-						ArgN2LabelStr = "Determines when it activates.\n01 = Base, 02 = Surge.";
-					}
-					if (EvidComboBox.Text == "ME_SUPER_ARMOR_OFF")
-					{
-						EvIdLabelStr = "Disables ME_SUPER_ARMOR_ON";
-					}
-					if (EvidComboBox.Text == "REQUEST_ACTION_ANIM_ID")
-					{
-						EvIdLabelStr = "Causes this move to end and starts any AnimationID you want to happen";
-						CoordNameLabelStr = "AnimationID to start";
-					}
-					if (EvidComboBox.Text == "START_CANCEL_RECEPTION")
-					{
-						EvIdLabelStr = "Allows you to Cancel this Animation";
-						CoordNameLabelStr = "Moves you can cancel into.\n\nCancel Data List is determined within:\n\"APK\\Content\\BluePrints\\APK\\Battle\\B_PlayerCancelDataTable.uasset\"";
-					}
-					if (EvidComboBox.Text == "END_CANCEL_RECEPTION")
-					{
-						EvIdLabelStr = "Disables START_CANCEL_RECEPTION";
-					}
-					if (EvidComboBox.Text == "ADD_CMB_CANCEL_ENABLE_TO_CANCEL")
-					{
-						EvIdLabelStr = "Lose Skill Gauge upon using START_CANCEL_RECEPTION, has to be used after it.\n\nSkill Gauge Prices is determined within:\n\"APK\\Content\\MasterData\\DA_MasterSkillData.uasset\"";
-					}
-					if (EvidComboBox.Text == "ME_CREATE_MELEECOLLISION_UNITGROUP")
-					{
-						EvIdLabelStr = "Damage ID to use for the next Hitbox. Use ME_CREATE_MELEECOLLISION_UNIT after this.";
-						CoordNameLabelStr = "Damage ID.\n\nDamage IDs are determined within <charID>prm_damage.uasset";
-					}
-					if (EvidComboBox.Text == "ME_CREATE_MELEECOLLISION_UNIT")
-					{
-						EvIdLabelStr = "Creates a Hitbox. Use ME_CREATE_MELEECOLLISION_UNITGROUP before this.";
-						ArgN1LabelStr = "Which ME_CREATE_MELEECOLLISION_UNITGROUP ID to use";
-						ArgN2LabelStr = "Hitbox #";
-						ArgF1LabelStr = "Size of the Hitbox";
-						ArgF4LabelStr = "X Offset Position?";
-						ArgF5LabelStr = "Y Offset Position?";
-						ArgF6LabelStr = "Z Offset Position?";
-						CoordNameLabelStr = "Bone to attach the Hitbox onto";
-					}
-					if (EvidComboBox.Text == "ME_DELETE_MELEECOLLISION_UNITGROUP")
-					{
-						EvIdLabelStr = "Disables ME_DELETE_MELEECOLLISION_UNITGROUP. (Removes Damage IDs)";
-						ArgN1LabelStr = "Which ME_DELETE_MELEECOLLISION_UNITGROUP ID to remove";
-					}
-					if (EvidComboBox.Text == "ME_DELETE_MELEECOLLISION_UNIT")
-					{
-						EvIdLabelStr = "Disables ME_CREATE_MELEECOLLISION_UNIT. (Deletes Hitboxes)";
-					}
-					if (EvidComboBox.Text == "ME_INSTANT_RECOVER_LIFE")
-					{
-						EvIdLabelStr = "Instantly Heals the Player";
-						ArgF1LabelStr = "Amount to Heal the Player (Akaza Heals by 1000)";
-					}
-					if (EvidComboBox.Text == "ME_DURATION_RECOVER_LIFE")
-					{
-						EvIdLabelStr = "Heals the Player Overtime";
-						ArgN1LabelStr = "Time it lasts? (Akaza has this as 300)";
-						ArgF1LabelStr = "Amount of Health to Gain (Akaza has this as 6.0)";
-					}
-
-					ApplyToolTip(EvidLabel, EvIdLabelStr, ttEvID);
-					ApplyToolTip(ArgN1Label, ArgN1LabelStr, ttArgN1);
-					ApplyToolTip(ArgN2Label, ArgN2LabelStr, ttArgN2);
-					ApplyToolTip(ArgN3Label, ArgN3LabelStr, ttArgN3);
-					ApplyToolTip(ArgF1Label, ArgF1LabelStr, ttArgF1);
-					ApplyToolTip(ArgF2Label, ArgF2LabelStr, ttArgF2);
-					ApplyToolTip(ArgF3Label, ArgF3LabelStr, ttArgF3);
-					ApplyToolTip(ArgF4Label, ArgF4LabelStr, ttArgF4);
-					ApplyToolTip(ArgF5Label, ArgF5LabelStr, ttArgF5);
-					ApplyToolTip(ArgF6Label, ArgF6LabelStr, ttArgF6);
-					ApplyToolTip(CoordNameLabel, CoordNameLabelStr, ttCoordName);
-					ApplyToolTip(DamageIdLabel, DamageIdLabelStr, ttDamageId);
-					ApplyToolTip(EndureIdLabel, EndureIdLabelStr, ttEndureId);
+					TimingLabelStr = "Timing is when this function happens.\nThese must be in proper order with -1 at the end.\n-1 means it happens when the animation finishes no matter what.";
 				}
+				if (EvidComboBox.Text == "ME_SET_SPEED")
+				{
+					EvIdLabelStr = "Causes Player to move";
+					ArgN2LabelStr = "Speed?";
+				}
+				if (EvidComboBox.Text == "ME_HOMING_SET")
+				{
+					EvIdLabelStr = "Causes Player to track the Opponent";
+				}
+				if (EvidComboBox.Text == "ME_HOMING_END")
+				{
+					EvIdLabelStr = "Disables ME_HOMING_SET";
+				}
+				if (EvidComboBox.Text == "ME_ON_LAND")
+				{
+					EvIdLabelStr = "Skips ahead to another Timing";
+					ArgN2LabelStr = "Timing to skip to";
+				}
+				if (EvidComboBox.Text == "ME_ANIMATION_RATE_CHANGE")
+				{
+					EvIdLabelStr = "Changing Animation Speed";
+					ArgF1LabelStr = "Animation Speed Rate";
+				}
+				if (EvidComboBox.Text == "ME_SUPER_ARMOR_ON")
+				{
+					EvIdLabelStr = "This Enables Super Armor used for Surge/Ground Tilt Attacks";
+					ArgN1LabelStr = "Priority? Surge entries has it marked as 10000 while Tilts have it as 5000.";
+					ArgN2LabelStr = "Determines when it activates.\n01 = Base, 02 = Surge.";
+				}
+				if (EvidComboBox.Text == "ME_SUPER_ARMOR_OFF")
+				{
+					EvIdLabelStr = "Disables ME_SUPER_ARMOR_ON";
+				}
+				if (EvidComboBox.Text == "REQUEST_ACTION_ANIM_ID")
+				{
+					EvIdLabelStr = "Causes this move to end and starts any AnimationID you want to happen";
+					CoordNameLabelStr = "AnimationID to start";
+				}
+				if (EvidComboBox.Text == "START_CANCEL_RECEPTION")
+				{
+					EvIdLabelStr = "Allows you to Cancel this Animation";
+					CoordNameLabelStr = "Moves you can cancel into.\n\nCancel Data List is determined within:\n\"APK\\Content\\BluePrints\\APK\\Battle\\B_PlayerCancelDataTable.uasset\"";
+				}
+				if (EvidComboBox.Text == "END_CANCEL_RECEPTION")
+				{
+					EvIdLabelStr = "Disables START_CANCEL_RECEPTION";
+				}
+				if (EvidComboBox.Text == "ADD_CMB_CANCEL_ENABLE_TO_CANCEL")
+				{
+					EvIdLabelStr = "Lose Skill Gauge upon using START_CANCEL_RECEPTION, has to be used after it.\n\nSkill Gauge Prices is determined within:\n\"APK\\Content\\MasterData\\DA_MasterSkillData.uasset\"";
+					CoordNameLabelStr = "This should be the same CoordName as START_CANCEL_RECEPTION.\nDetermines which Cancel Group should cost skill gauge.";
+				}
+				if (EvidComboBox.Text == "ME_CREATE_MELEECOLLISION_UNITGROUP")
+				{
+					EvIdLabelStr = "Damage ID to use for the next Hitbox. Use ME_CREATE_MELEECOLLISION_UNIT after this.";
+					CoordNameLabelStr = "Damage ID.\n\nDamage IDs are determined within <charID>prm_damage.uasset";
+				}
+				if (EvidComboBox.Text == "ME_CREATE_MELEECOLLISION_UNIT")
+				{
+					EvIdLabelStr = "Creates a Hitbox. Use ME_CREATE_MELEECOLLISION_UNITGROUP before this.";
+					ArgN1LabelStr = "Which ME_CREATE_MELEECOLLISION_UNITGROUP ID to use";
+					ArgN2LabelStr = "Hitbox #";
+					ArgF1LabelStr = "Size of the Hitbox";
+					ArgF4LabelStr = "X Offset Position?";
+					ArgF5LabelStr = "Y Offset Position?";
+					ArgF6LabelStr = "Z Offset Position?";
+					CoordNameLabelStr = "Bone to attach the Hitbox onto";
+				}
+				if (EvidComboBox.Text == "ME_DELETE_MELEECOLLISION_UNITGROUP")
+				{
+					EvIdLabelStr = "Disables ME_DELETE_MELEECOLLISION_UNITGROUP. (Removes Damage IDs)";
+					ArgN1LabelStr = "Which ME_DELETE_MELEECOLLISION_UNITGROUP ID to remove";
+				}
+				if (EvidComboBox.Text == "ME_DELETE_MELEECOLLISION_UNIT")
+				{
+					EvIdLabelStr = "Disables ME_CREATE_MELEECOLLISION_UNIT. (Deletes Hitboxes)";
+				}
+				if (EvidComboBox.Text == "ME_INSTANT_RECOVER_LIFE")
+				{
+					EvIdLabelStr = "Instantly Heals the Player";
+					ArgF1LabelStr = "Amount to Heal the Player (Akaza Heals by 1000)";
+				}
+				if (EvidComboBox.Text == "ME_DURATION_RECOVER_LIFE")
+				{
+					EvIdLabelStr = "Heals the Player Overtime";
+					ArgN1LabelStr = "Time it lasts? (Akaza has this as 300)";
+					ArgF1LabelStr = "Amount of Health to Gain (Akaza has this as 6.0)";
+				}
+				if (EvidComboBox.Text == "SET_SCALE")
+				{
+					EvIdLabelStr = "Sets the Players Size";
+					ArgF1LabelStr = "X Scale";
+					ArgF2LabelStr = "Y Scale";
+					ArgF3LabelStr = "Z Scale";
+				}
+				if (EvidComboBox.Text == "ME_ENABLE_SUPPORT")
+				{
+					EvIdLabelStr = "Allows the Player to call Assists & swap out with them";
+				}
+				if (EvidComboBox.Text == "ME_DISABLE_SUPPORT")
+				{
+					EvIdLabelStr = "Disables the Player from being able to call Assists & swap out with them";
+				}
+				if (EvidComboBox.Text == "ME_ENABLE_SUPPORT_ENEMY")
+				{
+					EvIdLabelStr = "Allows the Opponent to call Assists & swap out with them";
+				}
+				if (EvidComboBox.Text == "ME_DISABLE_SUPPORT_ENEMY")
+				{
+					EvIdLabelStr = "Disables the Opponent from being able to call Assists & swap out with them";
+				}
+				if (EvidComboBox.Text == "RESERVE_PERFORMANCE")
+				{
+					EvIdLabelStr = "\"PerformanceParam\" to start.\n\nThis is determined within \"APK\\Content\\BluePrints\\APK\\Characters\\Plc\\<CharID>\\<VersionID>\\B_<CharID>_<VersionID>.uasset\"";
+					CoordNameLabelStr = "Cinematic to start";
+				}
+				if (EvidComboBox.Text == "ME_ON_MAIN_CHARACTER_MELEE_ATTACK_HIT")
+				{
+					EvIdLabelStr = "Causes various stuff to happen upon hitting the opponent";
+					ArgN1LabelStr = "?";
+					ArgN2LabelStr = "Timing to skip to";
+					ArgN3LabelStr = "Hitting opponent as a main?";
+					ArgF1LabelStr = "?";
+					CoordNameLabelStr = "Always have seen this as \"Hit\"";
+				}
+
+				ApplyToolTip(TimingLabel, TimingLabelStr, ttTiming);
+				ApplyToolTip(EvidLabel, EvIdLabelStr, ttEvID);
+				ApplyToolTip(ArgN1Label, ArgN1LabelStr, ttArgN1);
+				ApplyToolTip(ArgN2Label, ArgN2LabelStr, ttArgN2);
+				ApplyToolTip(ArgN3Label, ArgN3LabelStr, ttArgN3);
+				ApplyToolTip(ArgF1Label, ArgF1LabelStr, ttArgF1);
+				ApplyToolTip(ArgF2Label, ArgF2LabelStr, ttArgF2);
+				ApplyToolTip(ArgF3Label, ArgF3LabelStr, ttArgF3);
+				ApplyToolTip(ArgF4Label, ArgF4LabelStr, ttArgF4);
+				ApplyToolTip(ArgF5Label, ArgF5LabelStr, ttArgF5);
+				ApplyToolTip(ArgF6Label, ArgF6LabelStr, ttArgF6);
+				ApplyToolTip(CoordNameLabel, CoordNameLabelStr, ttCoordName);
+				ApplyToolTip(DamageIdLabel, DamageIdLabelStr, ttDamageId);
+				ApplyToolTip(EndureIdLabel, EndureIdLabelStr, ttEndureId);
 			}
 		}
 
 		private void ApplyToolTip(Label labelname, String labelstr, ToolTip tooltip)
 		{
-			string InfoChar = " ⍰";
-
-			if (labelstr != "" && labelname.Text.Contains(InfoChar) == false)
+			if (labelstr != "" && labelname.Text.Contains(" ⍰") == false)
 			{
-				//labelname.Text = labelname.Text + InfoChar;
-				labelname.Text += InfoChar;
+				labelname.Text += " ⍰";
 				tooltip.SetToolTip(labelname, labelstr);
 			}
 		}
@@ -1603,7 +1620,7 @@ namespace Demon_Slayer_Character_Editor
 				NotifyUserMelee = true;
 				NotifyUserSupport = true;
 			}
-			else if(File.Exists(StreamingPath) && File.Exists(BasicStreamingPath) == false && File.Exists(DamageReacStreamingPath) == false && File.Exists(MeleeStreamingPath) == false && File.Exists(SupportStreamingPath) == false)
+			else if (File.Exists(StreamingPath) && File.Exists(BasicStreamingPath) == false && File.Exists(DamageReacStreamingPath) == false && File.Exists(MeleeStreamingPath) == false && File.Exists(SupportStreamingPath) == false)
 			{
 				MessageBox.Show("File Saved Successfully.");
 			}
@@ -2211,7 +2228,7 @@ namespace Demon_Slayer_Character_Editor
 			int RememberIndexNum = ListBoxIndex;
 			EventListBox.SelectedIndex = -1;
 
-            string[] Section = Array.Empty<string>();
+			string[] Section = Array.Empty<string>();
 
 			if (FinalIndex - ListBoxIndex <= 0)
 			{
@@ -2390,54 +2407,58 @@ namespace Demon_Slayer_Character_Editor
 
 		private void NumberKeyPress(TextBox textBox, KeyPressEventArgs e)
 		{
-			if (textBox.Focused)
+			if (textBox.Focused && (textBox.Text != "-" || textBox.Text != ""))
 			{
-				if (char.IsControl(e.KeyChar)) return;
-				if (!reg.IsMatch(textBox.Text.Insert(textBox.SelectionStart, e.KeyChar.ToString()) + "1")) e.Handled = true;
+				if (char.IsControl(e.KeyChar))
+					return;
+
+				if (!reg.IsMatch(textBox.Text.Insert(textBox.SelectionStart, e.KeyChar.ToString()) + "1"))
+					e.Handled = true;
 			}
 		}
 
 		private void NumberTextChanged(TextBox textBox, decimal Amount)
 		{
-			if (textBox.Focused)
+			if (textBox.Focused && (textBox.Text != "-" || textBox.Text != ""))
 			{
-				if (textBox.Text != "-" || textBox.Text == "")
+				try
 				{
-					try
-					{
-						Amount = Decimal.Parse(textBox.Text);
-					}
-					catch
-					{
-						Amount = 0;
-					}
-
-					if (Amount.ToString() != textBox.Text && Amount.ToString() + "." != textBox.Text)
-					{
-						textBox.Text = Amount.ToString();
-					}
+					Decimal.TryParse(textBox.Text, NumberStyles.Any, new CultureInfo("en-US"), out Amount);
+				}
+				catch
+				{
+					Amount = 0;
+					textBox.Text = "0";
 				}
 			}
 		}
 
 		private void NumberLeave(TextBox textBox, decimal Amount)
 		{
+			if (textBox.Text == "-" || textBox.Text == "" || textBox.Text == "-0" || textBox.Text == "-0.")
+			{
+				Amount = 0;
+				textBox.Text = "0";
+			}
+
 			if (textBox.Focused == false)
 			{
-				Decimal.TryParse(textBox.Text, out Amount);
-
-				if (textBox.Text == "-" || Amount.ToString() != textBox.Text && Amount.ToString() + "." != textBox.Text)
+				try
+				{
+					Decimal.TryParse(textBox.Text, NumberStyles.Any, new CultureInfo("en-US"), out Amount);
+				}
+				catch
 				{
 					Amount = 0;
-					textBox.Text = "0";
+					MessageBox.Show("Something went wrong inside NumberLeave function. Amount changed to 0");
 				}
-
-				//Trims off a remaining . if you forget to remove it.
-				char[] charsToTrim = { '.' };
-				string TrimmedCharString = textBox.Text.Trim(charsToTrim);
-
-				textBox.Text = TrimmedCharString;
 			}
+
+			//Trims off a remaining . if you forget to remove it.
+			char[] charsToTrim = { '.' };
+			string TrimmedCharString = textBox.Text.Trim(charsToTrim);
+
+			textBox.Text = TrimmedCharString;
 		}
 
 		private void Generalized_KeyPress(object sender, KeyPressEventArgs e)
@@ -2767,7 +2788,7 @@ namespace Demon_Slayer_Character_Editor
 					string EventIDStr = EventIDFunctions.GetValue(EvidComboBox.SelectedIndex)!.ToString()!;
 					NameOfTableIDTextbox.Text = SelectedIndexNumberForLoop.ToString() + " Anm: " + EAnimationIdComboBox.Text + ", Ev: " + EventIDStr + ", Timing: " + TimingTextBox.Text;
 
-					RedoRename:
+				RedoRename:
 					if (EventListBox.Items.Contains(NameOfTableIDTextbox.Text))
 					{
 						SelectedIndexNumberForLoop++;
@@ -3069,7 +3090,7 @@ namespace Demon_Slayer_Character_Editor
 						{
 							if (NotifyUserDamageReac)
 							{
-								MessageBox.Show(MessageBoxStr); 
+								MessageBox.Show(MessageBoxStr);
 								NotifyUserDamageReac = false;
 							}
 						}
@@ -3094,7 +3115,7 @@ namespace Demon_Slayer_Character_Editor
 			}
 		}
 
-        private void YoinkFromFileButton_Click(object sender, EventArgs e)
+		private void YoinkFromFileButton_Click(object sender, EventArgs e)
 		{
 			AllowToolTips = false;
 			bool UserBackedOut = false;
@@ -3104,7 +3125,7 @@ namespace Demon_Slayer_Character_Editor
 			int AppendCount = 0;
 			int FoundAnimIDToYoink = 0;
 			int IndexToSelect = 0;
-            string[] SectionToYoink = Array.Empty<string>();
+			string[] SectionToYoink = Array.Empty<string>();
 			List<string> lines = new List<string>();
 			StructGUIDFound = 0;
 
@@ -3340,5 +3361,5 @@ namespace Demon_Slayer_Character_Editor
 				}
 			}
 		}
-    }
+	}
 }
